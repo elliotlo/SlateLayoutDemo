@@ -57,6 +57,7 @@ Saved/*
 
 # Compiled source files for the engine to use
 Intermediate/*
+StandaloneWndLayoutDemo/Intermediate*
 
 # Cache files for the editor to use
 DerivedDataCache/*
