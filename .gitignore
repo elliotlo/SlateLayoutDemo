@@ -58,7 +58,7 @@ Saved/*
 
 # Compiled source files for the engine to use
 Intermediate/*
-Plugins\StandaloneWndLayoutDemo\Intermediate/*
+Plugins/StandaloneWndLayoutDemo/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
