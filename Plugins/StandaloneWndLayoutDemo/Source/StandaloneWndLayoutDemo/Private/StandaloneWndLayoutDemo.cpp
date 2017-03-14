@@ -62,6 +62,30 @@ void FStandaloneWndLayoutDemoModule::ShutdownModule()
 	FGlobalTabmanager::Get()->UnregisterNomadTabSpawner(StandaloneWndLayoutDemoTabName);
 }
 
+// create a new text block with text
+TSharedRef<STextBlock> NewTextBlock(FString String)
+{
+	return SNew(STextBlock)
+		.Text(FText::FromString(String));
+}
+
+// create new title
+TSharedRef<SBox> NewTitleBox(FString Title)
+{
+	// Use engine's font
+	FString FontPath = FPaths::EngineDir() + TEXT("Content\\Slate\\Fonts\\DroidSansMono.ttf");
+	FSlateFontInfo FontInfo(FontPath, 20);
+
+	return SNew(SBox)
+		.HAlign(EHorizontalAlignment::HAlign_Center)
+		[
+			SNew(STextBlock)
+			.Text(FText::FromString(Title))
+			.ColorAndOpacity(FSlateColor(FLinearColor(0.5f, 0.5f, 0.5f)))
+			.Font(FontInfo)
+		];
+}
+
 TSharedRef<SDockTab> FStandaloneWndLayoutDemoModule::OnSpawnPluginTab(const FSpawnTabArgs& SpawnTabArgs)
 {
 	FText WidgetText = FText::Format(
@@ -70,181 +94,105 @@ TSharedRef<SDockTab> FStandaloneWndLayoutDemoModule::OnSpawnPluginTab(const FSpa
 		FText::FromString(TEXT("TestEditorStandaloneWnd.cpp"))
 	);
 
+	// Create DockTab
+	TSharedRef<SDockTab> DockTab = SNew(SDockTab)
+									.TabRole(ETabRole::NomadTab);
 
+	// Create VerticalBox
+	TSharedRef<SVerticalBox> VerticalBox = SNew(SVerticalBox);
 
-	TSharedRef<SDockTab> DockTab =
-		SNew(SDockTab)
-		.TabRole(ETabRole::NomadTab)
+	VerticalBox->AddSlot()
+		.HAlign(EHorizontalAlignment::HAlign_Left)
 		[
-			// 建立一個 ScrollBox 
-			SNew(SScrollBox)
-			// 一開始先來個 VerticalBox
-			+ SScrollBox::Slot()
-			[
-				SNew(SBox)
-				.HAlign(EHorizontalAlignment::HAlign_Center)
-				[
-					SNew(STextBlock)
-					.Text(FText::FromString("--- VerticalBox ---"))
-				]
-			]
-			+ SScrollBox::Slot()
-			[
-				SNew(SVerticalBox)
-				+ SVerticalBox::Slot()
-				.HAlign(HAlign_Left)
-				[
-
-					// 靠左對齊
-					SNew(STextBlock)
-					.Text(FText::FromString("Vertical1 Align Left"))
-				]
-				+ SVerticalBox::Slot()
-				.HAlign(HAlign_Center)
-				[
-					// 置中對齊
-					SNew(STextBlock)
-					.Text(FText::FromString("Vertical2 Align Center"))
-				]
-				+ SVerticalBox::Slot()
-				.HAlign(HAlign_Right)
-				[
-					// 靠右對齊
-					SNew(STextBlock)
-					.Text(FText::FromString("Vertical3 Align Right"))
-				]
-			]
-			// 再來個 HorizontalBox
-			+ SScrollBox::Slot()
-			[
-				// 
-				SNew(SBox)
-				.HAlign(EHorizontalAlignment::HAlign_Center)
-				[
-					SNew(STextBlock)
-					.Text(FText::FromString("--- HorizontalBox ---"))
-				]
-			]
-			+ SScrollBox::Slot()
-			[
-				SNew(SHorizontalBox)
-				+ SHorizontalBox::Slot()
-				[
-					SNew(STextBlock)
-					.Text(FText::FromString("Horizontal1"))
-				]
-				+ SHorizontalBox::Slot()
-				[
-					SNew(STextBlock)
-					.ColorAndOpacity(FSlateColor(FLinearColor(0.5f, 0.7f, 0.3f)))	// 測試換顏色
-					.Text(FText::FromString("Horizontal2"))
-				]
-				+ SHorizontalBox::Slot()
-				[
-					SNew(STextBlock)
-					.Text(FText::FromString("Horizontal3"))
-				]
-			]
-			// WrapBox
-			+ SScrollBox::Slot()
-			[
-				// 
-				SNew(SBox)
-				.HAlign(EHorizontalAlignment::HAlign_Center)
-				[
-					SNew(STextBlock)
-					.Text(FText::FromString("--- WrapBox ---"))
-				]
-			]
-			+ SScrollBox::Slot()
-			[
-				SNew(SWrapBox)
-				.PreferredWidth(200)	// 超過多少寬度就自動wrap
-				+ SWrapBox::Slot()
-				[
-					SNew(STextBlock)
-					.Text(FText::FromString("Wrap1"))
-				]
-				+ SWrapBox::Slot()
-				[
-					SNew(STextBlock)
-					.Text(FText::FromString("Wrap2"))
-				]
-				+ SWrapBox::Slot()
-				[
-					SNew(STextBlock)
-					.Text(FText::FromString("Wrap3"))
-				]
-			]
-			// UniformGridBox
-			+ SScrollBox::Slot()
-			[
-				SNew(SBox)
-				.HAlign(EHorizontalAlignment::HAlign_Center)
-				[
-					SNew(STextBlock)
-					.Text(FText::FromString("--- UniformGridPanel ---"))
-				]
-			]
-			+ SScrollBox::Slot()
-			[
-				SNew(SUniformGridPanel)
-				.ForceVolatile(true)
-				+ SUniformGridPanel::Slot(0, 0)
-				[
-					SNew(STextBlock)
-					.Text(FText::FromString("Grid (0,0)"))
-				]
-				+ SUniformGridPanel::Slot(0, 1)
-				[
-					SNew(STextBlock)
-					.Text(FText::FromString("Grid (0,1)"))
-				]
-				+ SUniformGridPanel::Slot(0, 2)
-				[
-					SNew(STextBlock)
-					.Text(FText::FromString("Grid (0,2)"))
-				]
-				+ SUniformGridPanel::Slot(1, 0)
-				[
-					SNew(SEditableText)
-					.HintText(FText::FromString("Grid(1,0) editable"))
-				]
-				+ SUniformGridPanel::Slot(1, 2)
-				[
-					SNew(STextBlock)
-					.Text(FText::FromString("Grid (1,2)"))
-				]
-				+ SUniformGridPanel::Slot(2, 0)
-				[
-					SNew(STextBlock)
-					.Text(FText::FromString("Grid (2,0)"))
-				]
-				+ SUniformGridPanel::Slot(2, 1)
-				[
-					SNew(STextBlock)
-					.Text(FText::FromString("Grid (2,1)"))
-				]
-				+ SUniformGridPanel::Slot(2, 2)
-				[
-					/*FSlateBrush*/
-					SNew(SCheckBox)
-				]
-			]
+			NewTextBlock(TEXT("Vertical Align Left"))
+		];
+	VerticalBox->AddSlot()
+		.HAlign(EHorizontalAlignment::HAlign_Right)
+		[
+			NewTextBlock(TEXT("Vertical Align Right"))
+		];
+	VerticalBox->AddSlot()
+		.HAlign(EHorizontalAlignment::HAlign_Center)
+		[
+			NewTextBlock(TEXT("Vertical Align Center"))
+		];
+	VerticalBox->AddSlot()
+		.HAlign(EHorizontalAlignment::HAlign_Fill)
+		[
+			NewTextBlock(TEXT("Vertical Align Fill"))
+		];
+	VerticalBox->AddSlot()
+		[
+			SNew(SEditableText)
+			.HintText(FText::FromString(TEXT("editable")))
+		];
+	VerticalBox->AddSlot()
+		[
+			SNew(SCheckBox)
+			.ToolTipText(FText::FromString(TEXT("this is checkbox")))
 		];
 
-	//SNew(SDockTab)
-	//.TabRole(ETabRole::NomadTab)
-	//[
-	//	// Put your tab content here!
-	//	SNew(SBox)
-	//	.HAlign(HAlign_Center)
-	//.VAlign(VAlign_Center)
-	//[
-	//	SNew(STextBlock)
-	//	.Text(WidgetText)
-	//]
-	//];
+	// Create HorizontalBox
+	TSharedRef<SHorizontalBox> HorizontalBox = SNew(SHorizontalBox);
+	HorizontalBox->AddSlot()
+		[
+			NewTextBlock(TEXT("horizontal1"))
+		];
+	HorizontalBox->AddSlot()
+		[
+			SNew(STextBlock)
+			.ColorAndOpacity(FSlateColor(FLinearColor(0.5f, 0.7f, 0.3f)))	// Change Color and opacity
+			.Text(FText::FromString(TEXT("Horizontal2")))
+		];
+	HorizontalBox->AddSlot()
+		[
+			NewTextBlock(TEXT("Horizontal3"))
+		];
+
+	// Create WrapBox
+	TSharedRef<SWrapBox> WrapBox = SNew(SWrapBox)
+									.PreferredWidth(200);	// auto wrap when exceed;
+	int i;
+	const int WrapWidgetNum = 20;
+	for (i = 0; i < WrapWidgetNum; i++)
+	{
+		WrapBox->AddSlot()
+			[
+				SNew(STextBlock)
+				.Text(FText::FromString(TEXT("Wrap") + FString::FromInt(i)))
+			];
+	}
+
+
+	// Create UniformGridPanel
+	TSharedRef<SUniformGridPanel> UniformGird = SNew(SUniformGridPanel);
+	int row, col;
+	const int RowNum = 5;
+	const int ColNum = 4;
+	for (row = 0; row < RowNum; row++)
+	{
+		for (col = 0; col < ColNum; col++)
+		{
+			UniformGird->AddSlot(col, row)
+				[
+					NewTextBlock(TEXT("Gird(") + FString::FromInt(col) + TEXT(",") + FString::FromInt(row) + TEXT(")"))
+				];
+		}
+	}
+
+	// Add widgets to ScrollBox
+	TSharedRef<SScrollBox> ScrollBox = SNew(SScrollBox);
+	ScrollBox->AddSlot()[ NewTitleBox(TEXT("VerticalBox")) ];
+	ScrollBox->AddSlot()[ VerticalBox ];
+	ScrollBox->AddSlot()[ NewTitleBox(TEXT("HorizontalBox")) ];
+	ScrollBox->AddSlot()[ HorizontalBox ];
+	ScrollBox->AddSlot()[ NewTitleBox(TEXT("WrapBox")) ];
+	ScrollBox->AddSlot()[ WrapBox ];
+	ScrollBox->AddSlot()[ NewTitleBox(TEXT("UniformGridPanel")) ];
+	ScrollBox->AddSlot()[ UniformGird ];
+
+	// Set ScrollBox to DockTab
+	DockTab->SetContent(ScrollBox);
 
 
 	return DockTab;
