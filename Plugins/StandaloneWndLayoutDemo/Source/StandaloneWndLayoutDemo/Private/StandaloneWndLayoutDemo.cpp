@@ -14,6 +14,29 @@ static const FName StandaloneWndLayoutDemoTabName("StandaloneWndLayoutDemo");
 
 #define LOCTEXT_NAMESPACE "FStandaloneWndLayoutDemoModule"
 
+DEFINE_LOG_CATEGORY(LayoutDemoLog);
+
+
+// a custom widget for demo
+class STestWidget : public SCompoundWidget
+{
+	SLATE_BEGIN_ARGS(STestWidget)
+	{}
+	SLATE_END_ARGS()
+	void Construct(const FArguments& InArgs)
+	{
+	}
+
+public:
+	static FReply OnClickedButton(FString String) {
+		FReply Reply = FReply::Unhandled();
+		UE_LOG(LayoutDemoLog, Log, TEXT("OnClicked Arg=%s"), *String);
+		return FReply::Handled();
+	}
+};
+
+
+
 void FStandaloneWndLayoutDemoModule::StartupModule()
 {
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
@@ -62,19 +85,21 @@ void FStandaloneWndLayoutDemoModule::ShutdownModule()
 	FGlobalTabmanager::Get()->UnregisterNomadTabSpawner(StandaloneWndLayoutDemoTabName);
 }
 
-// create a new text block with text
-TSharedRef<STextBlock> NewTextBlock(FString String)
+
+TSharedRef<STextBlock> FStandaloneWndLayoutDemoModule::NewTextBlock(FString String)
 {
 	return SNew(STextBlock)
 		.Text(FText::FromString(String));
 }
 
-// create new title
-TSharedRef<SBox> NewTitleBox(FString Title)
+
+TSharedRef<SBox> FStandaloneWndLayoutDemoModule::NewTitleBox(FString Title)
 {
 	// Use engine's font
 	FString FontPath = FPaths::EngineDir() + TEXT("Content\\Slate\\Fonts\\DroidSansMono.ttf");
-	FSlateFontInfo FontInfo(FontPath, 20);
+	const int FontSize = 10;
+	FSlateFontInfo FontInfo(FontPath, FontSize);
+	FontInfo.OutlineSettings.OutlineColor = FLinearColor(0.5f, 1, 1);
 
 	return SNew(SBox)
 		.HAlign(EHorizontalAlignment::HAlign_Center)
@@ -100,6 +125,8 @@ TSharedRef<SDockTab> FStandaloneWndLayoutDemoModule::OnSpawnPluginTab(const FSpa
 
 	// Create VerticalBox
 	TSharedRef<SVerticalBox> VerticalBox = SNew(SVerticalBox);
+
+	TSharedRef<STestWidget> TestWidget = SNew(STestWidget);
 
 	VerticalBox->AddSlot()
 		.HAlign(EHorizontalAlignment::HAlign_Left)
@@ -130,6 +157,17 @@ TSharedRef<SDockTab> FStandaloneWndLayoutDemoModule::OnSpawnPluginTab(const FSpa
 		[
 			SNew(SCheckBox)
 			.ToolTipText(FText::FromString(TEXT("this is checkbox")))
+		];
+
+	FString String = FString(TEXT("test arg"));
+
+	VerticalBox->AddSlot()
+		[
+			SNew(SButton)
+			.Text(LOCTEXT("DisableButton", "Disable"))
+			.IsEnabled(true)
+			.OnClicked_Static(&STestWidget::OnClickedButton, String)
+			//.ClickMethod(EButtonClickMethod::DownAndUp)
 		];
 
 	// Create HorizontalBox
